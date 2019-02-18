@@ -165,7 +165,7 @@ export default {
     background-color: #a1a1a1;
   }
   &.scroll-style::-webkit-scrollbar-track {
-    -webkit-box-shadow: 0 0 0px gray inset;
+    box-shadow: 0 0 0px gray inset;
   }
 }
 </style>

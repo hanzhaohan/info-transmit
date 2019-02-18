@@ -8,6 +8,9 @@ var markdown_config = {
     quotes: '“”‘’'
 }
 var markdown = require('markdown-it')(markdown_config);
+//流程图
+import markdownItMermaid from 'markdown-it-mermaid';
+// var markdownItMermaid = require('markdown-it-mermaid');
 // 表情
 var emoji = require('markdown-it-emoji');
 // 下标
@@ -81,7 +84,8 @@ markdown.use(mihe, hljs_opts)
     .use(katex)
     .use(taskLists)
     .use(toc)
-
+    .use(markdownItMermaid)  
+    
 export default {
     data() {
         return {

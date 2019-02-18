@@ -158,7 +158,9 @@ export default {
     },
     //获取文章标题等内容
     _getParams() {
+      console.log(this.article.contentMd)
       let html = this.markdownIt.render(this.article.contentMd);
+      console.log(html)
       let formdata = new FormData();
       formdata.append("title", this.article.title);
       formdata.append("contentMd", this.article.contentMd);
