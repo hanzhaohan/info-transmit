@@ -18,12 +18,12 @@
         {{tabTitle[3].text}}
       </a>
     </div>
-    <div class="pane-header">
-      <div class="pane-header-line">
-        <div class="pane-title">{{tabWrite}}</div>
+    <div class="pane-header" :class="{'pane-block-active': paneBlock}">
+      <div class="pane-header-line" :class="{'pane-line-active': paneBlock}">
+        <div class="pane-title" v-show="isTitle">{{tabWrite}}</div>
       </div>
     </div>
-    <router-view :id="tabTitle[tabswitch].id" class="content-view"></router-view>
+    <router-view :id="tabTitle[tabswitch].id" class="content-view" :class="{'content-padding-active': paneBlock}"></router-view>
   </div>
 </template>
 
@@ -39,7 +39,10 @@ export default {
         { id: "pl", text: "产品清单", path: "/content/production" }
       ],
       tabswitch: 0, //切换tab
-      tabWrite: "最新消息" //内容标题
+      tabWrite: "最新消息", //内容标题
+      paneBlock: false, //pane线是否固定显示
+      isTitle: true, //是否显示标题
+      scrollTopBe: 0, //上一秒滚动轴位置
     };
   },
   created() {
@@ -51,6 +54,12 @@ export default {
         that.tabWrite = that.tabTitle[index].text;
       }
     })
+    PubSub.subscribe("tabS", (event, e) => {
+      this.tabSwitch(e);
+    }); 
+  },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll, false);
   },
   computed: {
     ...mapState(['tabsw']),
@@ -67,6 +76,21 @@ export default {
       this.tabswitch = data;
       this.tabWrite = this.tabTitle[data].text;
       this.$router.push(this.tabTitle[data].path);
+    },
+    handleScroll() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+      console.log(scrollTop)
+      if(scrollTop >= 153) {
+        this.paneBlock = true;
+      } else {
+        this.paneBlock = false;
+      }
+      if(scrollTop >= 153 && scrollTop < this.scrollTopBe) {
+        this.isTitle = false;
+      } else {
+        this.isTitle = true;
+      }
+      this.scrollTopBe = scrollTop;
     }
   }
 };
@@ -76,6 +100,8 @@ export default {
 .content {
   width: 100%;
   margin-top: 70px;
+  position: relative;
+  transition: all 0.5s;
   .tab-box {
     width: 100%;
     height: 80px;
@@ -132,6 +158,7 @@ export default {
     padding-left: 15px;
     padding-right: 15px;
     box-sizing: border-box;
+    transition: all 0.5s;
     .pane-header-line {
       width: 100%;
       height: 1px;
@@ -141,17 +168,30 @@ export default {
       justify-content: center;
       .pane-title {
         width: 240px;
-        height: 40px;
+        height: 25px;
         background-color: #fff;
         text-align: center;
         font-size: 24px;
         @media screen and (max-width: 768px) {
           font-size: 22px;
+          width: 140px;
         }
         font-family: "KaiTi";
         font-weight: 700;
       }
     }
+    .pane-line-active {
+      height: 0;
+    }
+  }
+  .pane-block-active {
+    position: fixed;
+    left: 0;
+    top: 4px;
+    z-index: 999;
+  }
+  .content-padding-active {
+    margin-top: 125px;
   }
 }
 </style>

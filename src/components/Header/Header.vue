@@ -1,6 +1,6 @@
 <template>
   <div class="header-wrap" style="position: relative;">
-    <div class="header">
+    <div class="header" :class="{'header-active': isShadow}">
       <div class="name-box" @click="$router.go(-1)">
         <h1 class="name"><i class="iconfont">&#xe604;</i>歐嘉璐尼</h1>
       </div>
@@ -37,6 +37,12 @@
             transition: 'all .3s'
           }"
         ></span>
+      </div>
+      <div class="tab-easy" v-show="isTabEasy">
+        <span @click="tabS(0)">最新消息</span>
+        <span @click="tabS(1)">帮助文档</span>
+        <span @click="tabS(2)">资料下载</span>
+        <span @click="tabS(3)">产品清单</span>
       </div>
     </div>
     <DialogExit :dialog-visible="dialogVisible"></DialogExit>
@@ -116,6 +122,9 @@ export default {
       },
       toggleLineData: [],
       domain: '', //ERP链接
+      isShadow: false, //是否显示阴影
+      isTabEasy: false, //是否显示简化版tab按钮
+      scrollTopBe: 0, //记录上次滚动轴的位置
     };
   },
   created() {
@@ -137,6 +146,9 @@ export default {
         this.toggle();
       }
     });
+  },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll, false);
   },
   components: {
     DialogExit
@@ -181,6 +193,23 @@ export default {
       this.toggleLineData = this.showMobileTabs
         ? this.lineStyle.closeLineData
         : this.lineStyle.normalLineData;
+    },
+    handleScroll() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+      if(scrollTop >= 153) {
+        this.isShadow = true;
+      } else {
+        this.isShadow = false;
+      }
+      if(scrollTop >= 153 && scrollTop < this.scrollTopBe) {
+        this.isTabEasy = true;
+      } else {
+        this.isTabEasy = false;
+      }
+      this.scrollTopBe = scrollTop;
+    },
+    tabS(index) {
+      PubSub.publish('tabS', index); 
     }
   }
 };
@@ -273,6 +302,36 @@ export default {
       }
     }
   }
+  .tab-easy {
+    position: absolute;
+    top: 60px;
+    left: 0px;
+    z-index: 999;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    background-color: rgba(244,246,248,0.9);
+    box-sizing: border-box;
+    padding-left: 30px;
+    @media screen and (max-width:768px) {
+      padding-left: 10px;
+    }
+    span {
+      display: inline-block;
+      width: 80px;
+      height: 100%;
+      color: #333;
+      text-align: center;
+      cursor: pointer;
+      font-size: 14px;
+      @media screen and (max-width:768px) {
+        width: 25%;
+      }
+    }
+  }
+}
+.header-active {
+  box-shadow: 0px 3px 5px -3px #888;
 }
   .mobile-tab-wrap {
     position: absolute;

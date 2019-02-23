@@ -53,6 +53,7 @@ export default {
   width: 100%;
   height: 100%;
   .content-wrap {
+    position: relative;
     max-width: 1000px;
     min-width: 320px;
     margin-left: auto;

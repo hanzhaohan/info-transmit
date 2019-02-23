@@ -1,6 +1,6 @@
 <template>
   <div class="helpAr-wrap">
-    <ul class="classify-box" v-if="isPc">
+    <ul class="classify-box" v-if="isPc" :class="{'classify-fix-active': classifyFix}">
       <div class="symbol" :style="{top: 16+tabSwitch*71+'px'}">
         <span class="symbol-traggle"></span>
         <span class="symbol-traggle blank"></span>
@@ -13,11 +13,11 @@
         @click="tabswitch(index)"
       >{{item.Name}}</li>
     </ul>
-    <div class='lef-btn' v-if="!isPc" @click="mobileShow">
+    <div class='lef-btn' v-if="!isPc" @click="mobileShow" :class="{'left-active': classifyFixM}">
       <i class='iconfont'>&#xe64e;</i>
     </div>
     <transition name="tabTaggle">
-      <ul class="mobileTab" v-show="!isPc && showMobileTabs">
+      <ul class="mobileTab" v-show="!isPc && showMobileTabs" :class="{'mobileTab-active': classifyFixM}">
         <li
           class="classify-item"
           :class="{'classify-active':index===tabSwitch}"
@@ -37,10 +37,10 @@
           </div>
         </li>
       </ul>
-    </div>
-    <no-data
+      <no-data
       v-if="hpTitle.length === 0"
       text="此分类下暂无文档~"/>
+    </div>
     <HintInfo
       :dialog-visible="dialogVisible"
       :eventName="pubsubEvent"
@@ -70,6 +70,8 @@ export default {
       index: -1, //删除标志
       isPc: true,
       showMobileTabs: false,
+      classifyFix: false, //pc
+      classifyFixM: false, //手机端
     };
   },
   components: {
@@ -121,6 +123,8 @@ export default {
         this.hpTitle = data;
       })
     })
+
+    window.addEventListener('scroll', this.handleScroll, false);
   },
   computed: {
     ...mapState(['loginInfos', 'tabswhp' , 'screen']),
@@ -147,6 +151,10 @@ export default {
       formData.append("docType", this.hpClassify[this.tabSwitch].Code);
       this.$store.dispatch("receiveHpTitle", formData).then(data => {
         this.hpTitle = data;
+        this.$nextTick(function() {
+          window.scrollTo(0, 200);
+          console.log(document.documentElement.scrollHeight+' '+window.innerHeight+' '+(document.documentElement.scrollHeight-window.innerHeight))
+        })
       })
     },
     detailAr(docEntry) {
@@ -184,6 +192,19 @@ export default {
     },
     mobileShow() {
       this.showMobileTabs = !this.showMobileTabs;
+    },
+    handleScroll() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+      if(scrollTop >= 153 && this.isPc == true) {
+        this.classifyFix = true;
+      } else {
+        this.classifyFix = false;
+      }
+      if(scrollTop >= 153 && this.isPc == false) {
+        this.classifyFixM = true;
+      } else {
+        this.classifyFixM = false;
+      }
     }
   }
 };
@@ -199,6 +220,7 @@ export default {
     width: 10%;
     padding: 10px 15px;
     border-right: 1px solid #ddd;
+    transition: all 0.5s;
     .classify-item {
       height: 26px;
       font-size: 16px;
@@ -235,9 +257,14 @@ export default {
       }
     }
   }
+  .classify-fix-active {
+    position: fixed;
+    top: 80px;
+    left: 25px;
+  }
   .lef-btn {
     position: fixed;
-    right: 25px;
+    right: 20px;
     top: 227px;
     width: 33px;
     height: 35px;
@@ -246,6 +273,7 @@ export default {
     text-align: center;
     line-height: 33px;
     box-shadow: 6px 0px 8px -5px #ccc;
+    transition: all 0.5s;
     .iconfont {
       font-size: 20px !important;
       position: absolute;
@@ -253,6 +281,9 @@ export default {
       top: 2px;
       color: #007bb7;
     }
+  }
+  .left-active {
+    top: 90px;
   }
   .mobileTab {
     position: fixed;
@@ -262,6 +293,7 @@ export default {
     padding: 10px 0;
     z-index: 100;
     background-color: #fff;
+    transition: all 0.5s;
     .classify-item {
       height: 10px;
       font-size: 14px;
@@ -280,13 +312,18 @@ export default {
       font-weight: bold;
     }
   }
+  .mobileTab-active {
+    top: 133px;
+  }
   .title-box {
     position: absolute;
     top: 15px;
     left: 17%;
+    width: 82%;
     @media screen and (max-width: 768px) {
       top: 12px;
       left: 10px;
+      width: 100%;
     }
     // border: 1px solid black;
     ul {
