@@ -38,12 +38,14 @@
           }"
         ></span>
       </div>
-      <div class="tab-easy" v-show="isTabEasy">
-        <span @click="tabS(0)">最新消息</span>
-        <span @click="tabS(1)">帮助文档</span>
-        <span @click="tabS(2)">资料下载</span>
-        <span @click="tabS(3)">产品清单</span>
-      </div>
+      <transition name="tabEasy">
+        <div class="tab-easy" v-show="isTabEasy">
+          <span @click="tabS(0)">最新消息</span>
+          <span @click="tabS(1)">帮助文档</span>
+          <span @click="tabS(2)">资料下载</span>
+          <span @click="tabS(3)">产品清单</span>
+        </div>
+      </transition>
     </div>
     <DialogExit :dialog-visible="dialogVisible"></DialogExit>
     <el-collapse>
@@ -333,45 +335,55 @@ export default {
 .header-active {
   box-shadow: 0px 3px 5px -3px #888;
 }
-  .mobile-tab-wrap {
-    position: absolute;
-    top: 60px;
-    left: 0;
-    z-index: 999;
-    background-color: #fff;
-    padding: 10px 0 10px 10px;
-    width: 100%;
-    transition: all 0.3s;
-    // overflow: hidden
-    border-top: 1px solid #eeeeee;
-    span {
-      display: block;
-      font-size: 14px;
-      padding: 15px 0 15px 10px;
-      .iconfont {
-        color: red;
-        margin-right: 10px;
-      }
-      .imgAdd {
-        color: #b3ee3a;
-      }
-      .login {
-        color: darkmagenta;
-      }
-      .exit {
-        color: #a0522d;
-      }
-      .home {
-        color: #76eec6;
-      }
+.mobile-tab-wrap {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  z-index: 999;
+  background-color: #fff;
+  padding: 10px 0 10px 10px;
+  width: 100%;
+  transition: all 0.3s;
+  // overflow: hidden
+  border-top: 1px solid #eeeeee;
+  span {
+    display: block;
+    font-size: 14px;
+    padding: 15px 0 15px 10px;
+    .iconfont {
+      color: red;
+      margin-right: 10px;
     }
-    a {
-      font-size: 14px;
-      padding: 15px 0 15px 10px;
-      .erp {
-        margin-right: 10px;
-        color: #b3ee3a;
-      }
+    .imgAdd {
+      color: #b3ee3a;
+    }
+    .login {
+      color: darkmagenta;
+    }
+    .exit {
+      color: #a0522d;
+    }
+    .home {
+      color: #76eec6;
     }
   }
+  a {
+    font-size: 14px;
+    padding: 15px 0 15px 10px;
+    .erp {
+      margin-right: 10px;
+      color: #b3ee3a;
+    }
+  }
+}
+.tabEasy-enter-active {
+  transition: all .3s ease;
+}
+.tabEasy-leave-active {
+  transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.tabEasy-enter, .tabTaggle-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
+}
 </style>

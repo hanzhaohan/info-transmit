@@ -20,7 +20,9 @@
     </div>
     <div class="pane-header" :class="{'pane-block-active': paneBlock}">
       <div class="pane-header-line" :class="{'pane-line-active': paneBlock}">
-        <div class="pane-title" v-show="isTitle">{{tabWrite}}</div>
+        <transition name="titleToggle">
+          <div class="pane-title" v-show="isTitle">{{tabWrite}}</div>
+        </transition>
       </div>
     </div>
     <router-view :id="tabTitle[tabswitch].id" class="content-view" :class="{'content-padding-active': paneBlock}"></router-view>
@@ -173,7 +175,7 @@ export default {
         text-align: center;
         font-size: 24px;
         @media screen and (max-width: 768px) {
-          font-size: 22px;
+          font-size: 20px;
           width: 140px;
         }
         font-family: "KaiTi";
@@ -193,5 +195,15 @@ export default {
   .content-padding-active {
     margin-top: 125px;
   }
+}
+.titleToggle-enter-active {
+  transition: all .4s ease;
+}
+.titleToggle-leave-active {
+  transition: all .2s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.titleToggle-enter, .tabTaggle-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
 }
 </style>

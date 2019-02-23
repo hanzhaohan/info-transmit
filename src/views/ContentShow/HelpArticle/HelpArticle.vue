@@ -152,7 +152,7 @@ export default {
       this.$store.dispatch("receiveHpTitle", formData).then(data => {
         this.hpTitle = data;
         this.$nextTick(function() {
-          window.scrollTo(0, 200);
+          window.scrollTo(0, 190);
           console.log(document.documentElement.scrollHeight+' '+window.innerHeight+' '+(document.documentElement.scrollHeight-window.innerHeight))
         })
       })
@@ -321,7 +321,7 @@ export default {
     left: 17%;
     width: 82%;
     @media screen and (max-width: 768px) {
-      top: 12px;
+      top: 8px;
       left: 10px;
       width: 100%;
     }
