@@ -90,7 +90,8 @@ const router = new VueRouter({
             name: 'detail',
             component: ArticleDetail,
             meta: {
-                isShow: true
+                isShow: true,
+                isShowMenus: true
             }
         },
         {

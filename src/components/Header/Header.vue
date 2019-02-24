@@ -11,6 +11,9 @@
         <span @click="$router.push('/content')">
           <i class="iconfont home">&#xe60b;</i>首页
         </span>
+        <span v-show="$route.meta.isShowMenus" @click="articleMenus">
+          <i class="iconfont menus">&#xe60d;</i>目录
+        </span>
         <span v-if="writePomission" @click="writeArticle">
           <i class="iconfont">&#xe60e;</i>编写文章
         </span>
@@ -24,19 +27,22 @@
           <i class="iconfont exit">&#xe669;</i>退出
         </span>
       </div>
-      <div class="toggle" v-if="!isPc" @click="toggle">
-        <span
-          class="toggle-line"
-          v-for="(line, index) in toggleLineData"
-          :key="index"
-          :style="{
-            width: line.width,
-            top: line.top,
-            transform: line.transform,
-            opacity: line.opacity,
-            transition: 'all .3s'
-          }"
-        ></span>
+      <div class="mobile-right" v-if="!isPc">
+        <div class="menus" v-show="$route.meta.isShowMenus" @click="articleMenus">目录</div>
+        <div class="toggle" @click="toggle">
+          <span
+            class="toggle-line"
+            v-for="(line, index) in toggleLineData"
+            :key="index"
+            :style="{
+              width: line.width,
+              top: line.top,
+              transform: line.transform,
+              opacity: line.opacity,
+              transition: 'all .3s'
+            }"
+          ></span>
+        </div>
       </div>
       <transition name="tabEasy">
         <div class="tab-easy" v-show="isTabEasy && $route.meta.isShowTitle">
@@ -46,24 +52,32 @@
           <span @click="tabS(3)">产品清单</span>
         </div>
       </transition>
+      <transition name="tabEasy">
+        <div class="menus-easy-mark" v-show="isMenusEasy && $route.meta.isShowMenus" @click="closeMenus">
+          <div class="menus-easy">
+            <NewInfo v-show="newOrHelp" id="nf"/>
+            <HelpArticle v-show="!newOrHelp"/>
+          </div>
+        </div>
+      </transition>
+      <el-collapse v-show="!isPc&&showMobileTabs">
+        <div class="mobile-tab-wrap">
+          <span @click="$router.push('/content');toggle();">
+            <i class="iconfont home">&#xe60b;</i>首页
+          </span>
+          <a :href="domain" @click="toggle()">
+            <i class="iconfont erp">&#xe657;</i>返回ERP
+          </a>
+          <span v-if="!isLogin" @click="loginClick">
+            <i class="iconfont login">&#xe734;</i>登录
+          </span>
+          <span v-else @click="exitClick">
+            <i class="iconfont exit">&#xe669;</i>退出
+          </span>
+        </div>
+      </el-collapse>
     </div>
     <DialogExit :dialog-visible="dialogVisible"></DialogExit>
-    <el-collapse>
-      <div class="mobile-tab-wrap" v-show="!isPc&&showMobileTabs">
-        <span @click="$router.push('/content');toggle();">
-          <i class="iconfont home">&#xe60b;</i>首页
-        </span>
-        <a :href="domain" @click="toggle()">
-          <i class="iconfont erp">&#xe657;</i>返回ERP
-        </a>
-        <span v-if="!isLogin" @click="loginClick">
-          <i class="iconfont login">&#xe734;</i>登录
-        </span>
-        <span v-else @click="exitClick">
-          <i class="iconfont exit">&#xe669;</i>退出
-        </span>
-      </div>
-    </el-collapse>
     <!-- <router-view></router-view> -->
   </div>
 </template>
@@ -72,6 +86,8 @@
 import { mapState, mapGetters } from "vuex";
 import DialogExit from "../DialogExit/DialogExit";
 import PubSub from "pubsub-js";
+import HelpArticle from "../../views/ContentShow/HelpArticle/HelpArticle"
+import NewInfo from "../../views/ContentShow/NewInfo/NewInfo"
 
 export default {
   data() {
@@ -127,6 +143,8 @@ export default {
       isShadow: false, //是否显示阴影
       isTabEasy: false, //是否显示简化版tab按钮
       scrollTopBe: 0, //记录上次滚动轴的位置
+      isMenusEasy: false, //是否展示简化版目录
+      newOrHelp: true, //最新消息还是帮助文档
     };
   },
   created() {
@@ -153,10 +171,12 @@ export default {
     window.addEventListener('scroll', this.handleScroll, false);
   },
   components: {
-    DialogExit
+    DialogExit,
+    HelpArticle,
+    NewInfo
   },
   computed: {
-    ...mapState(["loginInfos", "screen"]),
+    ...mapState(["loginInfos", "screen", "newInfo"]),
     //显示登录or退出
     isLogin() {
       return this.loginInfos.UserCode ? true : false;
@@ -212,6 +232,19 @@ export default {
     },
     tabS(index) {
       PubSub.publish('tabS', index); 
+    },
+    //文章目录
+    articleMenus() {
+      this.classify = this.$route.query.classify;
+      this.isMenusEasy = true;
+      if(this.classify == 'nf') {
+        this.newOrHelp = true;
+      } else {
+        this.newOrHelp = false;
+      }
+    },
+    closeMenus () {
+      this.isMenusEasy = false;
     }
   }
 };
@@ -277,30 +310,48 @@ export default {
       .home {
         color: #76eec6;
       }
+      .menus {
+        color: #6959CD;
+      }
       &:hover {
         color: red;
         cursor: pointer;
       }
     }
   }
-  .toggle {
-    width: 24px;
-    height: 17px;
-    background-color: #f9f9f9;
-    padding: 5px;
-    cursor: pointer;
-    line-height: 0;
-    margin-top: 15px;
-    .toggle-line {
-      position: relative;
+  .mobile-right {
+    .menus {
       display: inline-block;
-      vertical-align: top;
-      width: 100%;
-      height: 2px;
-      margin-top: 4px;
-      background-color: #262a30;
-      &:first-child {
-        margin-top: 0px;
+      width: 39px;
+      height: 17px;
+      background-color: #f9f9f9;
+      padding: 5px;
+      cursor: pointer;
+      line-height: 1;
+      margin-top: 15px;
+      margin-right: 5px;
+      text-align: center;
+    }
+    .toggle {
+      display: inline-block;
+      width: 24px;
+      height: 17px;
+      background-color: #f9f9f9;
+      padding: 5px;
+      cursor: pointer;
+      line-height: 0;
+      margin-top: 15px;
+      .toggle-line {
+        position: relative;
+        display: inline-block;
+        vertical-align: top;
+        width: 100%;
+        height: 2px;
+        margin-top: 4px;
+        background-color: #262a30;
+        &:first-child {
+          margin-top: 0px;
+        }
       }
     }
   }
@@ -331,51 +382,73 @@ export default {
       }
     }
   }
+  .menus-easy-mark {
+    position: fixed;
+    left: 0;
+    top: 60px;
+    z-index: 999;
+    width: 100%;
+    height: 92%;
+    background-color: rgba(0, 0, 0, 0.1);
+    .menus-easy {
+      width: 80%;
+      height: 100%;
+      // margin-top: 60px;
+      background-color: #f4f6f8;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+  }
+  .el-collapse {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+    .mobile-tab-wrap {
+      background-color: #fff;
+      padding: 10px 0 10px 10px;
+      width: 100%;
+      transition: all 0.3s;
+      // overflow: hidden
+      border-top: 1px solid #eeeeee;
+      span {
+        display: block;
+        font-size: 14px;
+        padding: 15px 0 15px 10px;
+        .iconfont {
+          color: red;
+          margin-right: 10px;
+        }
+        .imgAdd {
+          color: #b3ee3a;
+        }
+        .login {
+          color: darkmagenta;
+        }
+        .exit {
+          color: #a0522d;
+        }
+        .home {
+          color: #76eec6;
+        }
+      }
+      a {
+        font-size: 14px;
+        padding: 15px 0 15px 10px;
+        .erp {
+          margin-right: 10px;
+          color: #b3ee3a;
+        }
+      }
+    }
+  }
+  
 }
 .header-active {
   box-shadow: 0px 3px 5px -3px #888;
 }
-.mobile-tab-wrap {
-  position: absolute;
-  top: 60px;
-  left: 0;
-  z-index: 999;
-  background-color: #fff;
-  padding: 10px 0 10px 10px;
-  width: 100%;
-  transition: all 0.3s;
-  // overflow: hidden
-  border-top: 1px solid #eeeeee;
-  span {
-    display: block;
-    font-size: 14px;
-    padding: 15px 0 15px 10px;
-    .iconfont {
-      color: red;
-      margin-right: 10px;
-    }
-    .imgAdd {
-      color: #b3ee3a;
-    }
-    .login {
-      color: darkmagenta;
-    }
-    .exit {
-      color: #a0522d;
-    }
-    .home {
-      color: #76eec6;
-    }
-  }
-  a {
-    font-size: 14px;
-    padding: 15px 0 15px 10px;
-    .erp {
-      margin-right: 10px;
-      color: #b3ee3a;
-    }
-  }
-}
+
 .tabEasy-enter-active {
   transition: all .3s ease;
 }

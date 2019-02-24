@@ -13,7 +13,7 @@
         @click="tabswitch(index)"
       >{{item.Name}}</li>
     </ul>
-    <div class='lef-btn' v-if="!isPc" @click="mobileShow" :class="{'left-active': classifyFixM}">
+    <div class='lef-btn' v-if="!isPc" @click.stop="mobileShow" :class="{'left-active': classifyFixM}">
       <i class='iconfont'>&#xe64e;</i>
     </div>
     <transition name="tabTaggle">
@@ -23,7 +23,7 @@
           :class="{'classify-active':index===tabSwitch}"
           v-for="(item, index) in hpClassify"
           :key="index"
-          @click="tabswitch(index)"
+          @click.stop="tabswitch(index)"
         >{{item.Name}}</li>
       </ul>
     </transition>
@@ -290,7 +290,7 @@ export default {
     right: 0;
     top: 270px;
     width: 65px;
-    padding: 10px 0;
+    padding: 12px 0 12px 10px;
     z-index: 100;
     background-color: #fff;
     transition: all 0.5s;

@@ -77,6 +77,48 @@ export default {
     setTimeout(this.init, 1000);
     // this.$nextTick(this.init)
   },
+  watch: {
+    '$route' (to, from) {
+      this.docEntry = to.query.docEntry;
+      this.classify = to.query.classify;
+      let formdata = new FormData();
+      formdata.append("action", "ReceiveDetail");
+      formdata.append("docEntry", this.docEntry);
+      formdata.append("classify", this.classify);
+      formdata.append("userCode", localStorage.getItem("UserCode"));
+      this.$store
+        .dispatch("receiveDetail", formdata)
+        .then(res => {
+          this.article = res;
+          let auther = res[0].U_Auther;
+          if(localStorage.getItem('UserCode')) {
+            if(auther != '2') {
+              this.htmls = res[0].U_ContentHtml;
+              this.title = res[0].U_Title;
+              document.getElementsByTagName('title')[0].textContent = this.title;
+            } else {
+              this.isShowReadMark = true;
+            }
+          } else {
+            if(auther == '0') {
+              this.htmls = res[0].U_ContentHtml;
+              this.title = res[0].U_Title;
+              document.getElementsByTagName('title')[0].textContent = this.title;
+            } else {
+              // this.$router.push("/login");
+              this.$router.push({
+                path: '/login',
+                query: {
+                  tag: 'limit'
+                }
+              });
+            }
+          }
+        })
+        .catch(err => this.$toast(err, "error"));
+      setTimeout(this.init, 1000);
+    }
+  },
   methods: {
     init() {
       let imgDomList = document.getElementById('markdown-preview-body').getElementsByTagName('img');
