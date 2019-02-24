@@ -30,28 +30,32 @@ const router = new VueRouter({
             path: '/content',
             component: ContentShow,
             meta: {
-                isShow: true
+                isShow: true,
+                isShowTitle: true
             },
             children: [
                 {
                     path: '/content/newinfo',
                     component: NewInfo,
                     meta: {
-                        isShow: true
+                        isShow: true,
+                        isShowTitle: true
                     }
                 },
                 {
                     path: '/content/helparticle',
                     component: HelpArticle,
                     meta: {
-                        isShow: true
+                        isShow: true,
+                        isShowTitle: true
                     }
                 },
                 {
                     path: '/content/ardownload',
                     component: ArDownload,
                     meta: {
-                        isShow: true
+                        isShow: true,
+                        isShowTitle: true
                     },
                     children: [
                         {
@@ -71,7 +75,8 @@ const router = new VueRouter({
                     path: '/content/production',
                     component: Production,
                     meta: {
-                        isShow: true
+                        isShow: true,
+                        isShowTitle: true
                     }
                 },
                 {
@@ -137,7 +142,6 @@ router.beforeEach((to, from, next) => {
     const agent = navigator.userAgent
     const isiOS = !!agent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/) // ios终端
     if (!to.meta.requireAuth) {
-        // next();
         if (isiOS && to.path !== location.pathname) {
             // 此处不可使用location.replace
             location.assign(to.fullPath)
@@ -149,7 +153,6 @@ router.beforeEach((to, from, next) => {
             Vue.toast('请先登录!');
             next('/login');
         } else {
-            // next();
             if (isiOS && to.path !== location.pathname) {
                 // 此处不可使用location.replace
                 location.assign(to.fullPath)

@@ -39,7 +39,7 @@
         ></span>
       </div>
       <transition name="tabEasy">
-        <div class="tab-easy" v-show="isTabEasy">
+        <div class="tab-easy" v-show="isTabEasy && $route.meta.isShowTitle">
           <span @click="tabS(0)">最新消息</span>
           <span @click="tabS(1)">帮助文档</span>
           <span @click="tabS(2)">资料下载</span>

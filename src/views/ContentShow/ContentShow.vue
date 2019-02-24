@@ -81,7 +81,6 @@ export default {
     },
     handleScroll() {
       let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-      console.log(scrollTop)
       if(scrollTop >= 153) {
         this.paneBlock = true;
       } else {
