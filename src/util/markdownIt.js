@@ -32,23 +32,45 @@ var taskLists = require('markdown-it-task-lists')
 // container
 var container = require('markdown-it-container')
 //
-var toc = require('markdown-it-toc')
+// var toc = require('markdown-it-toc')
 // add target="_blank" to all link
 var defaultRender = markdown.renderer.rules.link_open || function(tokens, idx, options, env, self) {
     return self.renderToken(tokens, idx, options);
 };
 markdown.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+    console.log(self.rules)
     // If you are sure other plugins can't add `target` - drop check below
     var aIndex = tokens[idx].attrIndex('target');
 
     if (aIndex < 0) {
         tokens[idx].attrPush(['target', '_blank']); // add new attribute
     } else {
+        //attrs:获取该标签的属性名及值，["target", "_blank"]
         tokens[idx].attrs[aIndex][1] = '_blank';    // replace value of existing attr
     }
+    //另外token还有以下方法：
+    //tokens[idx].attrGet=function(name){}
+    //tokens[idx].attrSet=function(name,value){}
+    //tokens[idx].attrJoin=function(name,value){}
+
+    //idx:link_open的token在tokens数组的索引值
+    //options就是一些初始化markdown-it的配置项
+    //self就是Renderer对象，有rules属性，还有好多方法，打印可以查看rules里的属性和方法
+
 
     // pass token to default renderer.
     return defaultRender(tokens, idx, options, env, self);
+};
+
+// add class="my-blog-head" id="my-blog-head${index++}" to all h
+markdown.renderer.rules.heading_open = function (tokens, index) {
+    var level = tokens[index].tag;
+        var label = tokens[index + 1];
+        if (label.type === 'inline') {
+            return `<${level} class="my-blog-head" id="my-blog-head${label.map[0]}">`;
+        } else {
+            return '</h1>';
+        }
 };
 var mihe = require('markdown-it-highlightjs-external');
 // math katex
@@ -83,7 +105,7 @@ markdown.use(mihe, hljs_opts)
     .use(miip)
     .use(katex)
     .use(taskLists)
-    .use(toc)
+    // .use(toc)
     .use(markdownItMermaid)  
     
 export default {
