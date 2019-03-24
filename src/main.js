@@ -6,7 +6,7 @@ import router from './router'
 import store from './store'
 
 //按需引入element UI
-import { Button, Input, Dialog, Select, Option, Collapse, Breadcrumb, BreadcrumbItem } from 'element-ui'
+import { Button, Input, Dialog, Select, Option, Collapse, Breadcrumb, BreadcrumbItem, Tree } from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.component(Button.name, Button)
 Vue.component(Input.name, Input)
@@ -16,6 +16,7 @@ Vue.component(Option.name, Option)
 Vue.component(Collapse.name, Collapse)
 Vue.component(Breadcrumb.name, Breadcrumb)
 Vue.component(BreadcrumbItem.name, BreadcrumbItem)
+Vue.component(Tree.name, Tree)
 // Vue.component(Loading.name, Loading)
 import { Message } from 'element-ui'
 //引入时间过滤器

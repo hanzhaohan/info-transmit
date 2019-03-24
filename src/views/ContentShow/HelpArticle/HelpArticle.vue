@@ -1,46 +1,46 @@
 <template>
   <div class="helpAr-wrap">
-    <ul class="classify-box" v-if="isPc" :class="{'classify-fix-active': classifyFix}">
-      <div class="symbol" :style="{top: 16+tabSwitch*71+'px'}">
-        <span class="symbol-traggle"></span>
-        <span class="symbol-traggle blank"></span>
+    <div class="classify-box">
+      <el-tree v-if="isPc"
+        :data="treeList"
+        :props="defaultProps"
+        node-key="Code"
+        :default-expanded-keys="['001']"
+        :default-checked-keys="['001001']"
+        :highlight-current="true"
+        @node-click="handleNodeClick">
+      </el-tree>
+      <div class="title-box">
+        <ul>
+          <li v-for="(item, index) in hpTitle" :key="index" @click="detailAr(item.DocEntry)">
+            {{item.U_Title}}
+            <div class="btn-edit" v-show="showEdit">
+              <span class="edit" @click.stop="editAr(item.DocEntry)">编辑</span>
+              <span class="delete" @click.stop="deleteAr(index)">删除</span>
+            </div>
+          </li>
+        </ul>
+        <no-data
+        v-if="hpTitle.length === 0"
+        text="此分类下暂无文档~"/>
       </div>
-      <li
-        class="classify-item"
-        :class="{'classify-active':index===tabSwitch}"
-        v-for="(item, index) in hpClassify"
-        :key="index"
-        @click="tabswitch(index)"
-      >{{item.Name}}</li>
-    </ul>
+    </div>
     <div class='lef-btn' v-if="!isPc" @click.stop="mobileShow" :class="{'left-active': classifyFixM}">
       <i class='iconfont'>&#xe64e;</i>
     </div>
     <transition name="tabTaggle">
-      <ul class="mobileTab" v-show="!isPc && showMobileTabs" :class="{'mobileTab-active': classifyFixM}">
-        <li
-          class="classify-item"
-          :class="{'classify-active':index===tabSwitch}"
-          v-for="(item, index) in hpClassify"
-          :key="index"
-          @click.stop="tabswitch(index)"
-        >{{item.Name}}</li>
-      </ul>
+      <div class="mobileTab" v-show="!isPc && showMobileTabs" :class="{'mobileTab-active': classifyFixM}">
+        <el-tree
+        :data="treeList"
+        :props="defaultProps"
+        node-key="Code"
+        :default-expanded-keys="['001']"
+        :default-checked-keys="['001001']"
+        :highlight-current="true"
+        @node-click="handleNodeClick">
+      </el-tree>
+      </div>
     </transition>
-    <div class="title-box">
-      <ul>
-        <li v-for="(item, index) in hpTitle" :key="index" @click="detailAr(item.DocEntry)">
-          {{item.U_Title}}
-          <div class="btn-edit" v-show="showEdit">
-            <span class="edit" @click.stop="editAr(item.DocEntry)">编辑</span>
-            <span class="delete" @click.stop="deleteAr(index)">删除</span>
-          </div>
-        </li>
-      </ul>
-      <no-data
-      v-if="hpTitle.length === 0"
-      text="此分类下暂无文档~"/>
-    </div>
     <HintInfo
       :dialog-visible="dialogVisible"
       :eventName="pubsubEvent"
@@ -70,8 +70,13 @@ export default {
       index: -1, //删除标志
       isPc: true,
       showMobileTabs: false,
-      classifyFix: false, //pc
       classifyFixM: false, //手机端
+      treeList:[],//分类的树状结构
+      defaultProps: {
+        children: 'children',
+        label: 'Name'
+      },
+      code:'',//初始化的code
     };
   },
   components: {
@@ -115,10 +120,12 @@ export default {
     formData.append("userCode", localStorage.getItem("UserCode"));
     this.$store.dispatch("receiveHpClassify", formData).then(data => {
       this.hpClassify = data;
+      this.treeList = this.treeify(data);
+      this.isChild(this.treeList[0]);
       let formData = new FormData();
       formData.append("action", "ReceiveHpTitle");
       formData.append("userCode", localStorage.getItem("UserCode"));
-      formData.append("docType", this.hpClassify[this.tabSwitch].Code);
+      formData.append("docType", this.code);
       this.$store.dispatch("receiveHpTitle", formData).then(data => {
         this.hpTitle = data;
       })
@@ -141,6 +148,59 @@ export default {
     }
   },
   methods: {
+    isChild(data){
+      if(data.children.length>0){
+        this.isChild(data.children[0])
+      }else{
+        this.code = data.Code;
+      }
+    },
+    treeify(data){
+      let that = this;
+      let tree = [];
+      let firCode = data[0].Code;
+      let firLen = firCode.length;
+      let firH = firLen/3;
+      data.forEach(function(item,index){
+        item.children = [];
+        let h = item.Code.length/3;
+        if(h==firH){
+          tree.push(item);
+        }else{
+          let idx = item.Code.charAt(firLen-1);
+          tree[idx-1].children.push(item);
+        }
+      })
+      tree.forEach(function(child){
+        let childArr = child.children;
+        let ids = 0;
+        let firL = data[0].Code.length;
+        childArr.forEach(function(childitem){
+          if(childitem.Code.length > firL){
+            ids = 1;
+          }
+        })
+        if (ids == 1) {
+          child.children = that.treeify(childArr)
+        }
+      })
+      return tree;
+    },
+    handleNodeClick(e){
+      if(e.children.length==0){
+        this.showMobileTabs = false;
+        let formData = new FormData();
+        formData.append("action", "ReceiveHpTitle");
+        formData.append("userCode", localStorage.getItem("UserCode"));
+        formData.append("docType", e.Code);
+        this.$store.dispatch("receiveHpTitle", formData).then(data => {
+          this.hpTitle = data;
+          this.$nextTick(function() {
+            window.scrollTo(0, 190);
+          })
+        })
+      }
+    },
     tabswitch(index) {
       this.$store.commit(TAB_SWITCH_HP, index);
       this.showMobileTabs = false;
@@ -195,11 +255,6 @@ export default {
     },
     handleScroll() {
       let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-      if(scrollTop >= 153 && this.isPc == true) {
-        this.classifyFix = true;
-      } else {
-        this.classifyFix = false;
-      }
       if(scrollTop >= 153 && this.isPc == false) {
         this.classifyFixM = true;
       } else {
@@ -216,60 +271,67 @@ export default {
   width: 100%;
   box-sizing: border-box;
   .classify-box {
-    position: relative;
-    width: 10%;
+    display:flex;
+    justify-content:flex-start;
     padding: 10px 15px;
-    border-right: 1px solid #ddd;
     transition: all 0.5s;
-    .classify-item {
-      height: 26px;
-      font-size: 16px;
-      color: #888;
-      line-height: 26px;
-      cursor: pointer;
-      &:not(:last-child) {
-        margin-bottom: 45px;
-      }
-      &:hover:not(.classify-active) {
-        color: #333;
+    .title-box {
+      flex:1 1;
+      ul {
+        li {
+          position: relative;
+          float: left;
+          margin-bottom: 10px;
+          margin-left: 22px;  
+          @media screen and (max-width: 768px) {
+            margin-right: 10px;
+            margin-left: 10px;  
+            width: 320px
+          }
+          width: 310px;
+          font-size: 14px;
+          height: 30px;
+          color: #666;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          cursor: pointer;
+          list-style: disc !important;
+          &:hover {
+            color: #333;
+          }
+          .btn-edit {
+            position: absolute;
+            right: 22px;
+            bottom: 0px;
+            font-size: 12px;
+            color: #79a5e5;
+            display: none;
+            span {
+              padding-right: 7px;
+              cursor: pointer;
+            }
+          }
+          &:hover {
+            .btn-edit {
+              display: block;
+              @media screen and (max-width: 768px) {
+                display: none;
+              }
+            }
+          }
+        }
       }
     }
-    .classify-active {
-      color: #333;
-      font-weight: bold;
-    }
-    .symbol {
-      position: absolute;
-      top: 16px;
-      right: -8px;
-      transform: scaleX(0.8);
-      .symbol-traggle {
-        float: left;
-        height: 10px;
-        width: 10px;
-        border: 1px solid #ddd;
-        transform: rotate(45deg);
-      }
-      .blank {
-        border-color: #fff;
-        background-color: #fff;
-        margin-left: -10px;
-      }
-    }
-  }
-  .classify-fix-active {
-    position: fixed;
-    top: 80px;
-    left: 25px;
   }
   .lef-btn {
     position: fixed;
-    right: 20px;
-    top: 227px;
+    left: 20px;
+    top: 209px;
     width: 33px;
     height: 35px;
     z-index: 100;
-    background-color: #fff;
+    background-color: transparent;
     text-align: center;
     line-height: 33px;
     box-shadow: 6px 0px 8px -5px #ccc;
@@ -283,14 +345,14 @@ export default {
     }
   }
   .left-active {
-    top: 90px;
+    top: 98px;
+    left:0;
   }
   .mobileTab {
     position: fixed;
-    right: 0;
-    top: 270px;
-    width: 65px;
-    padding: 12px 0 12px 10px;
+    left: 0;
+    top: 242px;
+    padding: 12px 10px 12px 10px;
     z-index: 100;
     background-color: #fff;
     transition: all 0.5s;
@@ -313,65 +375,7 @@ export default {
     }
   }
   .mobileTab-active {
-    top: 133px;
-  }
-  .title-box {
-    position: absolute;
-    top: 15px;
-    left: 17%;
-    width: 82%;
-    @media screen and (max-width: 768px) {
-      top: 8px;
-      left: 10px;
-      width: 100%;
-    }
-    // border: 1px solid black;
-    ul {
-      li {
-        position: relative;
-        float: left;
-        margin-bottom: 10px;
-        margin-right: 49px;
-        margin-left: 22px;  
-        @media screen and (max-width: 768px) {
-          margin-right: 10px;
-          margin-left: 10px;  
-          width: 320px
-        }
-        width: 310px;
-        font-size: 14px;
-        height: 30px;
-        color: #666;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        cursor: pointer;
-        list-style: disc !important;
-        &:hover {
-          color: #333;
-        }
-        .btn-edit {
-          position: absolute;
-          right: 22px;
-          bottom: 0px;
-          font-size: 12px;
-          color: #79a5e5;
-          display: none;
-          span {
-            padding-right: 7px;
-            cursor: pointer;
-          }
-        }
-        &:hover {
-          .btn-edit {
-            display: block;
-            @media screen and (max-width: 768px) {
-              display: none;
-            }
-          }
-        }
-      }
-    }
+    top: 123px;
   }
 }
 .tabTaggle-enter-active {

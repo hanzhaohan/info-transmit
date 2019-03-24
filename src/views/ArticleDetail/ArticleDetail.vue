@@ -264,8 +264,11 @@ export default {
       }
       if (this.menuTree) {
         for (let i = 0, len = this.menuSource.length; i < len; i++) {
-          let item = this.menuSource[i]
-          let top = document.getElementById(item.id).getBoundingClientRect().top
+          let item = this.menuSource[i];
+          let top;
+          if(document.getElementById(item.id)){
+            top = document.getElementById(item.id).getBoundingClientRect().top
+          }
           top += document.body.scrollTop || document.documentElement.scrollTop
           if (scrollTop <= top + 20) {
             this.menuTag=item.tag;
@@ -321,7 +324,10 @@ export default {
     width: 24px;
     height: 24px;
     background-color: #000;
-    right: 10px;
+    right: 50px;
+    @media screen and (max-width: 768px){
+      right: 10px;
+    }
     bottom: 15px;
     padding: 5px;
     z-index: 1050;
