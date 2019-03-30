@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Header @articleShow="articleShow" @imageShow="imageShow" v-show="$route.meta.isShow"/>
+    <Header class="noprint" @articleShow="articleShow" @imageShow="imageShow" v-show="$route.meta.isShow"/>
     <router-view class="content-wrap" />
   </div>
 </template>
@@ -52,6 +52,11 @@ export default {
 #app {
   width: 100%;
   height: 100%;
+  .noprint{
+    @media print {
+      display : none
+    }
+  }
   .content-wrap {
     position: relative;
     max-width: 1000px;

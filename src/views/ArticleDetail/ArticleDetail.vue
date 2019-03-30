@@ -4,7 +4,7 @@
     <ArticleMenu :menu=menuTree :menuTag=menuTag />
     <link href="//cdn.bootcss.com/github-markdown-css/2.4.1/github-markdown.css" rel="stylesheet">
     <div id="markdown-preview-body" class="v-show-content scroll-style preview markdown-body" v-html="htmls"></div>
-    <ToolBar />
+    <ToolBar class="noprint"/>
     <!-- 返回顶部 -->
     <transition name="slide-fade">
       <div class="to-top" @click="scrollToTarget(0)" v-show="showScrollToTop">
@@ -284,6 +284,9 @@ export default {
 <style lang="less" rel="stylesheet/less" scoped>
 .article-box {
   margin: 80px auto;
+  @media print {
+    margin:0px auto;
+  }
   width: 100%;
   overflow-y: auto;
   padding: 0 0;
@@ -318,6 +321,11 @@ export default {
     line-height: 2.5em;
     font-size: 16px;
     color: #666;
+  }
+  .noprint{
+    @media print {
+      display : none
+    }
   }
   .to-top{
     position: fixed;
