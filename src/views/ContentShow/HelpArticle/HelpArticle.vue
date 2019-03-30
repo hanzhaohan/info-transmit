@@ -55,7 +55,8 @@
 import { TAB_SWITCH, TAB_SWITCH_HP } from "../../../store/mutation-types";
 import { mapState } from "vuex";
 import HintInfo from "../../../components/HintInfo/HintInfo";
-import NoData from '../../../components/NoData/NoData'
+import NoData from '../../../components/NoData/NoData';
+import treeify from '../../../util/treeify'
 export default {
   props: {
     id: String
@@ -120,7 +121,7 @@ export default {
     formData.append("userCode", localStorage.getItem("UserCode"));
     this.$store.dispatch("receiveHpClassify", formData).then(data => {
       this.hpClassify = data;
-      this.treeList = this.treeify(data);
+      this.treeList = treeify(data);
       this.isChild(this.treeList[0]);
       let formData = new FormData();
       formData.append("action", "ReceiveHpTitle");
@@ -154,37 +155,6 @@ export default {
       }else{
         this.code = data.Code;
       }
-    },
-    treeify(data){
-      let that = this;
-      let tree = [];
-      let firCode = data[0].Code;
-      let firLen = firCode.length;
-      let firH = firLen/3;
-      data.forEach(function(item,index){
-        item.children = [];
-        let h = item.Code.length/3;
-        if(h==firH){
-          tree.push(item);
-        }else{
-          let idx = item.Code.charAt(firLen-1);
-          tree[idx-1].children.push(item);
-        }
-      })
-      tree.forEach(function(child){
-        let childArr = child.children;
-        let ids = 0;
-        let firL = data[0].Code.length;
-        childArr.forEach(function(childitem){
-          if(childitem.Code.length > firL){
-            ids = 1;
-          }
-        })
-        if (ids == 1) {
-          child.children = that.treeify(childArr)
-        }
-      })
-      return tree;
     },
     handleNodeClick(e){
       if(e.children.length==0){
@@ -326,7 +296,7 @@ export default {
   }
   .lef-btn {
     position: fixed;
-    left: 20px;
+    left: 0px;
     top: 209px;
     width: 33px;
     height: 35px;
@@ -356,6 +326,8 @@ export default {
     z-index: 100;
     background-color: #fff;
     transition: all 0.5s;
+    max-height:150px;
+    overflow:auto;
     .classify-item {
       height: 10px;
       font-size: 14px;

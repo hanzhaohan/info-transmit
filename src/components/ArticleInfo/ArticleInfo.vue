@@ -5,7 +5,7 @@
       <div class="close" @click="close">X</div>
       <div class="content-box">
         <div class="classify">文章分类：
-          <el-select v-model="valueAll.classifyValue" clearable placeholder="请选择">
+          <el-select v-model="valueAll.classifyValue" placeholder="请选择">
             <el-option
               v-for="item in classifyOptions"
               :key="item.value"
@@ -14,18 +14,34 @@
             ></el-option>
           </el-select>
         </div>
-        <div class="classify" v-show="hpShow">文档分类：
-          <el-select v-model="valueAll.hpValue" clearable placeholder="请选择">
+        <div class="classify c_wrap" v-show="hpShow">文档分类：
+          <!-- <el-select v-model="valueAll.hpValue" clearable placeholder="请选择">
             <el-option
               v-for="item in hpClassify"
               :key="item.Code"
               :label="item.Name"
               :value="item.Code"
             ></el-option>
-          </el-select>
+          </el-select> -->
+          <div class="c_box">
+            <div  @click="hpClick" class="in_hp">
+              <el-input v-model="valueAll.hpValueName" readonly="readonly" :suffix-icon="icons" placeholder="请输入内容"></el-input>
+            </div>
+            <div class="box-card" v-show="hpSelect">
+              <el-tree
+                :data="treeList"
+                :props="defaultProps"
+                node-key="Code"
+                :default-expanded-keys="['001']"
+                :default-checked-keys="['001001']"
+                :highlight-current="true"
+                @node-click="handleNodeClick">
+              </el-tree>
+            </div>
+          </div>
         </div>
         <div class="classify">文章权限：
-          <el-select v-model="valueAll.limitValue" clearable placeholder="请选择">
+          <el-select v-model="valueAll.limitValue" placeholder="请选择">
             <el-option 
               v-for="item in limitArr" 
               :key="item.Code" 
@@ -44,6 +60,7 @@
 </template>
 
 <script>
+import treeify from '../../util/treeify'
 export default {
   props: ["valueA", "valueB", "valueC"],
   data() {
@@ -61,13 +78,23 @@ export default {
       ],
       valueAll: {
         classifyValue: "", //第一个选项值
-        hpValue: "", //第二个选项值
+        hpValue: "", //第二个选项值Code
+        hpValueName: "", //第二个选项值Name
         limitValue: "",//第三个选项值权限
       },
       hpShow: false, //是否显示帮助文档分类
       hpClassify: [], //帮助文档分类,需要向服务器获取
       // limitArr: ["所有人可见", "需登录", "登录+独立密码"] //权限选择
-      limitArr: [{Code:"0",Name:"所有人可见"}, {Code: "1",Name:"需登录"}, {Code:"2",Name:"登录+独立密码"}] //权限选择
+      limitArr: [{Code:"0",Name:"所有人可见"}, {Code: "1",Name:"需登录"}, {Code:"2",Name:"登录+独立密码"}], //权限选择
+      treeList:[],//分类的树状结构
+      defaultProps: {
+        children: 'children',
+        label: 'Name'
+      },
+      icons:'el-icon-arrow-down',
+      hpSelect:false,
+      code:'',//文档分类的code
+      name:'',//文档分类的name
     };
   },
   mounted() {
@@ -87,7 +114,16 @@ export default {
             formData.append("userCode", localStorage.getItem("UserCode"));
             this.$store
               .dispatch("receiveHpClassify", formData)
-              .then(data => (this.hpClassify = data));
+              .then(data => {
+                this.hpClassify = data;
+                let that = this;
+                this.hpClassify.forEach(function(item,index){
+                  if(item.Code==that.valueAll.hpValue){
+                    that.valueAll.hpValueName = item.Name;
+                  }
+                })
+                this.treeList = treeify(data);
+              });
           }
         }
       },
@@ -95,6 +131,22 @@ export default {
     }
   },
   methods: {
+    hpClick(){
+      this.hpSelect = !this.hpSelect;
+      if(this.hpSelect){
+        this.icons = 'el-icon-arrow-up';
+      }else{
+        this.icons = 'el-icon-arrow-down';
+      }
+    },
+    handleNodeClick(e){
+      if(e.children.length==0){
+        this.hpSelect = false;
+        this.icons = 'el-icon-arrow-down';
+        this.valueAll.hpValue = e.Code;
+        this.valueAll.hpValueName = e.Name;
+      }
+    },
     //关闭弹窗
     close() {
       this.$emit("close", false);
@@ -160,6 +212,37 @@ export default {
       padding-top: 50px;
       .classify {
         margin-bottom: 5px;
+      }
+      .c_wrap{
+        .c_box{
+          position:relative;
+          width:217px;
+          display:inline-block;
+          .in_hp{
+            cursor:pointer;
+            .el-input--suffix{
+              input{
+                cursor:pointer !important;
+              }
+            }
+          }
+          .box-card{
+            position:absolute;
+            top:45px;
+            left:0;
+            z-index:10;
+            background-color:#fff;
+            width:217px;
+            max-height:115px;
+            overflow:auto;
+            box-shadow:0 2px 12px 0 rgba(0,0,0,.1);
+            border:1px solid #ebeef5;
+            color:#303133;
+            transition:.3s;
+            border-radius:4px;
+            padding:20px 10px;
+          }
+        }
       }
     }
     .btn-box {

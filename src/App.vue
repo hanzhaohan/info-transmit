@@ -52,6 +52,7 @@ export default {
 #app {
   width: 100%;
   height: 100%;
+  border: 1px solid transparent;
   .noprint{
     @media print {
       display : none
