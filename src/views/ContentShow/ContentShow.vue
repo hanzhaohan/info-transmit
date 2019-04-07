@@ -81,12 +81,12 @@ export default {
     },
     handleScroll() {
       let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-      if(scrollTop >= 153) {
+      if(scrollTop >= 120) {
         this.paneBlock = true;
       } else {
         this.paneBlock = false;
       }
-      if(scrollTop >= 153 && scrollTop < this.scrollTopBe) {
+      if(scrollTop >= 120 && scrollTop < this.scrollTopBe) {
         this.isTitle = false;
       } else {
         this.isTitle = true;
@@ -100,7 +100,7 @@ export default {
 <style lang="less" rel="stylesheet/less" scoped>
 .content {
   width: 100%;
-  margin-top: 70px;
+  margin-top: 40px;
   position: relative;
   transition: all 0.5s;
   .tab-box {
@@ -110,34 +110,36 @@ export default {
     justify-content: space-around;
     .tab {
       position: relative;
-      padding-top: 70px;
+      cursor:pointer;
+      padding-top: 61px;
       @media screen and (max-width: 768px) {
         font-size: 14px;
       }
       &::before {
         content: "";
-        width: 50px;
-        height: 50px;
+        width: 45px;
+        height: 45px;
         @media screen and (max-width: 768px) {
-          width: 45px;
-          height: 45px;
+          width: 40px;
+          height: 40px;
         }
         color: #41464b;
         position: absolute;
-        left: 4px; //132px;
+        left: 7px; //132px;
         top: 10px;
         border: 1px solid #41464b;
         border-radius: 50%;
       }
       .iconfont {
-        font-size: 30px !important;
+        font-size: 25px !important;
         @media screen and (max-width: 768px) {
-          font-size: 28px !important;
+          font-size: 25px !important;
         }
         position: absolute;
-        left: 16px;//143px;
+        left: 19px;//143px;
         @media screen and (max-width: 768px) {
-          left: 14px;
+          left: 16px;
+          top: 19px;
         }
         top: 21px;
         color: #41464b;
@@ -154,8 +156,8 @@ export default {
   }
   .pane-header {
     width: 100%;
-    margin-top: 55px;
-    margin-bottom: 40px;
+    margin-top: 30px;
+    margin-bottom: 30px;
     padding-left: 15px;
     padding-right: 15px;
     box-sizing: border-box;
@@ -172,9 +174,9 @@ export default {
         height: 25px;
         background-color: #fff;
         text-align: center;
-        font-size: 24px;
+        font-size: 20px;
         @media screen and (max-width: 768px) {
-          font-size: 20px;
+          font-size: 18px;
           width: 140px;
         }
         font-family: "KaiTi";
@@ -192,7 +194,7 @@ export default {
     z-index: 999;
   }
   .content-padding-active {
-    margin-top: 125px;
+    margin-top: 65px;
   }
 }
 .titleToggle-enter-active {

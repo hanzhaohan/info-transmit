@@ -47,3 +47,6 @@ export const delectFile = param => ajaxs.ajaxCommon('/api/service/DOC_DataHandle
 
 //合并文件
 export const merge = param => ajaxs.ajaxCommon('/api/service/DOC_DataHandle.ashx', param, 'POST')
+
+//搜索（最新消息/帮助文档/资料下载）
+export const receiveSearch = param => ajaxs.ajaxCommon('/api/service/DOC_DataHandle.ashx', param, 'POST')

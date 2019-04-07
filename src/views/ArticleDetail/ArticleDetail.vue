@@ -283,7 +283,7 @@ export default {
 
 <style lang="less" rel="stylesheet/less" scoped>
 .article-box {
-  margin: 80px auto;
+  margin: 60px auto;
   @media print {
     margin:0px auto;
   }

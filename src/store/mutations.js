@@ -15,7 +15,10 @@ import {
     RECEIVE_HELP_TITLE,
     TAB_SWITCH_HP,
     RECEIVE_READLOGININFO,
-    RECEIVE_FILES
+    RECEIVE_FILES,
+    RECEIVE_SEARCH_Q,
+    RECEIVE_SEARCH_CON,
+    RECEIVE_SEARCH_DATA,
 } from './mutation-types'
 
 export const mutations = {
@@ -69,5 +72,14 @@ export const mutations = {
     },
     [RECEIVE_FILES](state, data) {
         state.files = data;
+    },
+    [RECEIVE_SEARCH_Q](state, data) {
+        state.sq = data;
+    },
+    [RECEIVE_SEARCH_CON](state, data) {
+        state.scon = data;
+    },
+    [RECEIVE_SEARCH_DATA](state, data) {
+        state.sdata = data;
     },
 } 

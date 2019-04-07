@@ -17,4 +17,7 @@ export const state = {
     tabswhp: 0, //控制帮助文档tab
     isReadLogin: false, //阅读密钥（暂时不用）
     files: [],  //资料下载里的文件信息
+    sq:-1,//搜索-分类索引
+    scon:'',//搜索-关键字
+    sdata:[],//搜索-数据
 }

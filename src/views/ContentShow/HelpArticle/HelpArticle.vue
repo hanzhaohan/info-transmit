@@ -225,7 +225,7 @@ export default {
     },
     handleScroll() {
       let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-      if(scrollTop >= 153 && this.isPc == false) {
+      if(scrollTop >= 120 && this.isPc == false) {
         this.classifyFixM = true;
       } else {
         this.classifyFixM = false;

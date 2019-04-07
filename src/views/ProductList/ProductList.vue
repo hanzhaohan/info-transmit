@@ -3,7 +3,7 @@
     <div class="content">
       <div class="production-wrap">
         <div class="search-box">
-          <el-input placeholder="请输入查询内容" v-model="searchContent" class="input-with-select">
+          <el-input placeholder="请输入查询内容" v-model="searchContent" class="input-with-select" @keyup.enter.native="searchPr">
             <el-button slot="append" icon="el-icon-search" @click="searchPr"></el-button>
           </el-input>
         </div>
@@ -66,7 +66,7 @@ export default {
   .content {
     width: 100%;
     .production-wrap {
-      padding-top: 70px;
+      padding-top: 50px;
       .search-box {
         width: 60%;
         margin-bottom: 5px;

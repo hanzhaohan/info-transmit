@@ -16,3 +16,6 @@ export const RECEIVE_HELP_TITLE = 'receive_help_title' //获取帮助文档标�
 export const TAB_SWITCH_HP = 'tab_switch_hp' //记录帮助文档tab切换
 export const RECEIVE_READLOGININFO = 'receive_readlogininfo' //阅读密钥
 export const RECEIVE_FILES = 'receive_files' //获取文件信息
+export const RECEIVE_SEARCH_Q = 'receive_search_q' //搜索-分类索引
+export const RECEIVE_SEARCH_CON = 'receive_search_con' //搜索-关键字
+export const RECEIVE_SEARCH_DATA = 'receive_search_data' //搜索-数据

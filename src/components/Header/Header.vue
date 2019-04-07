@@ -2,7 +2,7 @@
   <div class="header-wrap" style="position: relative;">
     <div class="header" :class="{'header-active': isShadow}">
       <div class="name-box" @click="$router.go(-1)">
-        <h1 class="name"><i class="iconfont">&#xe604;</i>歐嘉璐尼</h1>
+        <h3 class="name"><i class="iconfont">&#xe604;</i>歐嘉璐尼</h3>
       </div>
       <!-- <div class="search-box">
         <el-input placeholder="请输入查询内容" prefix-icon="el-icon-search" v-model="queryContent"></el-input>
@@ -10,6 +10,9 @@
       <div class="login-box" v-if="isPc">
         <span @click="$router.push('/content')">
           <i class="iconfont home">&#xe60b;</i>首页
+        </span>
+        <span v-show="$route.meta.isShowSearch" @click="search">
+          <i class="iconfont menus">&#xe60f;</i>搜索
         </span>
         <span v-show="$route.meta.isShowMenus" @click="articleMenus">
           <i class="iconfont menus">&#xe60d;</i>目录
@@ -28,6 +31,7 @@
         </span>
       </div>
       <div class="mobile-right" v-if="!isPc">
+        <div class="menus" v-show="$route.meta.isShowSearch" @click="search">搜索</div>
         <div class="menus" v-show="$route.meta.isShowMenus" @click="articleMenus">目录</div>
         <div class="toggle" @click="toggle">
           <span
@@ -145,6 +149,7 @@ export default {
       scrollTopBe: 0, //记录上次滚动轴的位置
       isMenusEasy: false, //是否展示简化版目录
       newOrHelp: true, //最新消息还是帮助文档
+      searchObj:{'newinfo':0,'helparticle':1,'files':2},//搜索
     };
   },
   created() {
@@ -218,12 +223,12 @@ export default {
     },
     handleScroll() {
       let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-      if(scrollTop >= 153) {
+      if(scrollTop >= 120) {
         this.isShadow = true;
       } else {
         this.isShadow = false;
       }
-      if(scrollTop >= 153 && scrollTop < this.scrollTopBe) {
+      if(scrollTop >= 120 && scrollTop < this.scrollTopBe) {
         this.isTabEasy = true;
       } else {
         this.isTabEasy = false;
@@ -245,6 +250,16 @@ export default {
     },
     closeMenus () {
       this.isMenusEasy = false;
+    },
+    search(){
+      let pArr = this.$route.path.split('/');
+      let p = pArr[pArr.length-1];
+      this.$router.push({
+        path:'/search',
+        query:{
+          q:this.searchObj[p]
+        }
+      })
     }
   }
 };
@@ -256,7 +271,7 @@ export default {
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 40px;
   z-index: 999;
   max-width: 1000px;
   min-width: 320px;
@@ -270,14 +285,14 @@ export default {
   justify-content: space-between;
   background-color: #fff;
   .name-box {
-    height: 60px;
-    line-height: 60px;
+    height: 40px;
+    line-height: 40px;
     cursor: pointer;
     .name {
       margin: 0;
-      font-size: 24px;
+      font-size: 20px;
       @media screen and (max-width: 768px) {
-        font-size: 22px;
+        font-size: 18px;
       }
     }
   }
@@ -287,8 +302,8 @@ export default {
   //   margin: auto 40px;
   // }
   .login-box {
-    height: 60px;
-    line-height: 60px;
+    height: 40px;
+    line-height: 40px;
     span {
       font-size: 14px;
       &:not(:last-child) {
@@ -328,7 +343,7 @@ export default {
       padding: 5px;
       cursor: pointer;
       line-height: 1;
-      margin-top: 15px;
+      margin-top: 8px;
       margin-right: 5px;
       text-align: center;
     }
@@ -340,7 +355,7 @@ export default {
       padding: 5px;
       cursor: pointer;
       line-height: 0;
-      margin-top: 15px;
+      margin-top: 8px;
       .toggle-line {
         position: relative;
         display: inline-block;
@@ -357,7 +372,7 @@ export default {
   }
   .tab-easy {
     position: absolute;
-    top: 60px;
+    top: 40px;
     left: 0px;
     z-index: 999;
     width: 100%;
@@ -385,7 +400,7 @@ export default {
   .menus-easy-mark {
     position: fixed;
     left: 0;
-    top: 60px;
+    top: 45px;
     z-index: 999;
     width: 100%;
     height: 92%;
@@ -401,7 +416,7 @@ export default {
   }
   .el-collapse {
     position: absolute;
-    top: 60px;
+    top: 40px;
     left: 0;
     width: 100%;
     z-index: 999;

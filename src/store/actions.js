@@ -14,7 +14,8 @@ import {
     receiveFiles,
     saveFolder,
     delectFile,
-    merge
+    merge,
+    receiveSearch
 } from '../api'
 
 import {
@@ -30,7 +31,8 @@ import {
     RECEIVE_HELP_CLASSIFY,
     RECEIVE_HELP_TITLE,
     RECEIVE_READLOGININFO,
-    RECEIVE_FILES
+    RECEIVE_FILES,
+    RECEIVE_SEARCH_DATA,
 } from './mutation-types'
 
 export const actions = {
@@ -156,5 +158,11 @@ export const actions = {
         let result = await merge(param);
         console.log(result)
         return result;
-    }
+    },
+    //搜索（最新消息/帮助文档/资料下载）
+    async receiveSearch({ commit }, param) {
+        let result = await receiveSearch(param);
+        commit(RECEIVE_SEARCH_DATA, result);
+        return Promise.resolve(result);
+    },
 }

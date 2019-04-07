@@ -22,6 +22,7 @@ const ArticleDetail = () => import('../views/ArticleDetail/ArticleDetail')
 import PlAddImage from '../views/PlAddImage/PlAddImage'
 import ProductList from '../views/ProductList/ProductList'
 import Files from '../views/ContentShow/ArDownload/Files/Files'
+import Search from '../views/Search/Search'
 
 const router = new VueRouter({
     mode: 'history',
@@ -39,7 +40,8 @@ const router = new VueRouter({
                     component: NewInfo,
                     meta: {
                         isShow: true,
-                        isShowTitle: true
+                        isShowTitle: true,
+                        isShowSearch: true
                     }
                 },
                 {
@@ -47,7 +49,8 @@ const router = new VueRouter({
                     component: HelpArticle,
                     meta: {
                         isShow: true,
-                        isShowTitle: true
+                        isShowTitle: true,
+                        isShowSearch: true
                     }
                 },
                 {
@@ -55,14 +58,16 @@ const router = new VueRouter({
                     component: ArDownload,
                     meta: {
                         isShow: true,
-                        isShowTitle: true
+                        isShowTitle: true,
+                        isShowSearch: true
                     },
                     children: [
                         {
                             path: '/content/ardownload/files',
                             component: Files,
                             meta: {
-                                isShow: true
+                                isShow: true,
+                                isShowSearch: true
                             }
                         },
                         // {
@@ -122,6 +127,13 @@ const router = new VueRouter({
         {
             path: '/productlist',
             component: ProductList,
+            meta: {
+                isShow: true
+            }
+        },
+        {
+            path: '/search',
+            component: Search,
             meta: {
                 isShow: true
             }
