@@ -108,6 +108,7 @@ export default {
     height: 80px;
     display: flex;
     justify-content: space-around;
+    color:#333;
     .tab {
       position: relative;
       cursor:pointer;
@@ -166,9 +167,9 @@ export default {
       width: 100%;
       height: 1px;
       background-color: #e5e5e5;
-      line-height: 1px;
       display: flex;
       justify-content: center;
+      align-items:center;
       .pane-title {
         width: 240px;
         height: 25px;
@@ -180,7 +181,8 @@ export default {
           width: 140px;
         }
         font-family: "KaiTi";
-        font-weight: 700;
+        color:#333;
+        line-height:25px;
       }
     }
     .pane-line-active {
@@ -190,7 +192,7 @@ export default {
   .pane-block-active {
     position: fixed;
     left: 0;
-    top: 4px;
+    top: 16px;
     z-index: 999;
   }
   .content-padding-active {
