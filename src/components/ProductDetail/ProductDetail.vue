@@ -77,6 +77,8 @@ export default {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
     color: #fff;
+    display:flex;
+    flex-direction: column;
     .img-container {
       position: relative;
       width: 50%;
@@ -84,8 +86,8 @@ export default {
       padding-top: 50%;
       margin: 10px auto;
       @media screen and (max-width: 768px) {
-         width: 70%;
-         padding-top: 70%;
+         width: 60%;
+         padding-top: 60%;
       }
       .img-box {
         position: absolute;
@@ -102,6 +104,8 @@ export default {
     .content-box {
       padding: 30px 10px 10px 20%;
       font-size: 14px;
+      flex:1 1;
+      overflow:auto;
       @media screen and (max-width: 768px) {
          font-size: 14px;
          padding:  20px 5px 5px 15%;
