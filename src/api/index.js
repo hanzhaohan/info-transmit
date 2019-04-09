@@ -1,7 +1,8 @@
 import ajaxs from './ajax'
 
 //上传图片
-export const uploadImage = param => ajaxs.ajaxFile('/api/service/DOC_DataHandle.ashx', param)
+// export const uploadImage = param => ajaxs.ajaxFile('/api/service/DOC_DataHandle.ashx', param)
+export const uploadImage = param => ajaxs.ajaxFile('http://upload-z1.qiniup.com/nf', param, 'POST')
 
 //发布文章
 export const publishArticle = param => ajaxs.ajaxCommon('/api/service/DOC_DataHandle.ashx', param, 'POST')
@@ -50,3 +51,6 @@ export const merge = param => ajaxs.ajaxCommon('/api/service/DOC_DataHandle.ashx
 
 //搜索（最新消息/帮助文档/资料下载）
 export const receiveSearch = param => ajaxs.ajaxCommon('/api/service/DOC_DataHandle.ashx', param, 'POST')
+
+//获取上传图片到七牛的token
+export const receiveToken = param => ajaxs.ajaxCommon('/api/service/DOC_DataHandle.ashx', param, 'POST')

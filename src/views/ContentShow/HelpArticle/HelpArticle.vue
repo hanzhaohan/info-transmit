@@ -297,7 +297,7 @@ export default {
   .lef-btn {
     position: fixed;
     left: 0px;
-    top: 209px;
+    top: 148px;
     width: 33px;
     height: 35px;
     z-index: 100;
@@ -321,7 +321,7 @@ export default {
   .mobileTab {
     position: fixed;
     left: 0;
-    top: 242px;
+    top: 181px;
     padding: 12px 10px 12px 10px;
     z-index: 100;
     background-color: #fff;

@@ -15,7 +15,8 @@ import {
     saveFolder,
     delectFile,
     merge,
-    receiveSearch
+    receiveSearch,
+    receiveToken
 } from '../api'
 
 import {
@@ -163,6 +164,11 @@ export const actions = {
     async receiveSearch({ commit }, param) {
         let result = await receiveSearch(param);
         commit(RECEIVE_SEARCH_DATA, result);
+        return Promise.resolve(result);
+    },
+    //获取图片上传至七牛的token
+    async receiveToken({ commit }, param) {
+        let result = await receiveToken(param);
         return Promise.resolve(result);
     },
 }

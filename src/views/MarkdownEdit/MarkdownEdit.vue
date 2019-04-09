@@ -19,7 +19,13 @@
       :valueB="this.markArticle[this.id] ? this.markArticle[this.id].U_Type1 : ''"
       :valueC="this.markArticle[this.id] ? this.markArticle[this.id].U_Auther : ''"
     />
-    <HintInfo :dialog-visible="dialogVisible" :eventName="pubsubEvent" hint="发布成功！" btn1="写新文章" btn2="查看文章"/>
+    <HintInfo
+      :dialog-visible="dialogVisible"
+      :eventName="pubsubEvent"
+      hint="发布成功！"
+      btn1="写新文章"
+      btn2="查看文章"
+    />
   </div>
 </template>
 
@@ -32,7 +38,8 @@ import MarkdownIt from "../../util/markdownIt";
 
 import ArticleInfo from "../../components/ArticleInfo/ArticleInfo";
 import HintInfo from "../../components/HintInfo/HintInfo";
-
+import qiniufile from "../../util/qiniufile";
+import uuid from "../../util/uuid"
 import { mapState, mapActions } from "vuex";
 
 export default {
@@ -44,15 +51,15 @@ export default {
         contentMd: "" //文章内容MD
       },
       infoShow: false, //是否显示弹窗组件
-      classify: '',
+      classify: "",
       id: -1,
       markArticle: [],
       dialogVisible: false, // 是否显示发布成功提示框
-      classifyAr: '', //当前发布文章的分类(用于文章发布完直接查看文章)
-      hpClassify: '', //当前发布文章的帮助文档分类(用于文章发布完直接查看文章)
-      limitAr: '', //当前发布文章的文章权限(用于文章发布完直接查看文章)
+      classifyAr: "", //当前发布文章的分类(用于文章发布完直接查看文章)
+      hpClassify: "", //当前发布文章的帮助文档分类(用于文章发布完直接查看文章)
+      limitAr: "", //当前发布文章的文章权限(用于文章发布完直接查看文章)
       docEntry: 0, //当前发布文章的唯一标识符(用于文章发布完直接查看文章)
-      pubsubEvent: 'mdPublish', //发布订阅事件名
+      pubsubEvent: "mdPublish" //发布订阅事件名
     };
   },
   components: {
@@ -63,16 +70,16 @@ export default {
   created() {
     //初始化
     this.classify = this.$route.query.classify;
-    if(this.classify === 'nf') {
+    if (this.classify === "nf") {
       this.markArticle = this.newInfo;
-    } else if (this.classify === 'hw') {
+    } else if (this.classify === "hw") {
       this.markArticle = this.hpContent;
     }
     this.id = this.$route.query.id;
     if (this.id >= 0) {
       this.article.title = this.markArticle[this.id].U_Title;
       this.article.contentMd = this.markArticle[this.id].U_ContentMd;
-    };
+    }
     //订阅关闭对话框事件
     PubSub.subscribe(this.pubsubEvent, (event, e) => {
       if (e) {
@@ -86,18 +93,23 @@ export default {
         });
       } else {
         this.dialogVisible = e;
-        this.$router.replace('/mdedit');
-        this.article.contentMd = '';
-        this.article.title = '';
-        this.classifyAr = '';
+        this.$router.replace("/mdedit");
+        this.article.contentMd = "";
+        this.article.title = "";
+        this.classifyAr = "";
       }
     });
   },
   computed: {
-    ...mapState(['newInfo', 'hpContent'])
+    ...mapState(["newInfo", "hpContent"])
   },
   methods: {
-    ...mapActions(["uploadImage", "publishArticle", "saveArticle"]),
+    ...mapActions([
+      "uploadImage",
+      "publishArticle",
+      "saveArticle",
+      "receiveToken"
+    ]),
     //保存为草稿
     saveFile(value, render) {
       if (this.id >= 0) {
@@ -168,21 +180,41 @@ export default {
     //保存图片到服务器
     imgAdd(pos, $file) {
       let formdata = new FormData();
-      formdata.append("action", "SaveImage");
-      formdata.append("image", $file);
-      this.uploadImage(formdata)
+      // formdata.append("action", "SaveImage");
+      // formdata.append("image", $file);
+      // this.uploadImage(formdata)
+      //   .then(data => {
+      //     if (data.ret === 1) {
+      //       this.$refs.md.$img2Url(pos, "/api" + data.pathImage);
+      //     } else if (data.ret === -1) {
+      //       this.$toast("图片为空", "error");
+      //     } else {
+      //       this.$toast("上传失败", "error");
+      //     }
+      //   })
+      //   .catch(error => this.$toast("上传失败", "error"));
+      formdata.append("action", "QiNiuToken");
+      formdata.append("Bucket", "ogahome-doc-article");
+      this.receiveToken(formdata)
         .then(data => {
-          if (data.ret === 1) {
-            this.$refs.md.$img2Url(pos, "/api" + data.pathImage);
-          } else if (data.ret === -1) {
-            this.$toast("图片为空", "error");
+          if (data != "") {
+            // let formParams = new FormData()
+            // formParams.append('token', data)
+            // formParams.append('file', $file)
+            // this.uploadImage(formParams).then(data => {
+            //   console.log(data)
+            // })
+            let key = 'article/' + uuid();
+            qiniufile.upload($file,key,data).then(res => {
+              this.$refs.md.$img2Url(pos, "http://doc.article.ogahome.cn/" + res.key);
+            })
           } else {
-            this.$toast("上传失败", "error");
+            this.$toast("获取token失败", "error");
           }
         })
-        .catch(error => this.$toast("上传失败", "error"));
+        .catch(error => this.$toast('图片上传失败', "error"));
     },
-    imgDel() {},
+    imgDel(e) {console.log(e)},
     //关闭弹窗
     close(e) {
       this.infoShow = e;
