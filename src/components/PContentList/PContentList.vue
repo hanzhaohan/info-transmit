@@ -32,7 +32,7 @@
       <div class="img-container">
         <div class="img-box" @click="showBigImg(index)">
           <img
-            :src="item.U_MaxPicPath ? '/api'+item.U_MaxPicPath :'/image/backup.jpg'"
+            :src="item.U_MaxPicPath ? item.U_MaxPicPath :'/image/backup.jpg'"
             :ref="index"
           >
         </div>
@@ -73,6 +73,9 @@ import { mapState } from "vuex";
 import UploadImg from "../../util/uploadImg";
 import ProductDetail from "../ProductDetail/ProductDetail";
 import PubSub from "pubsub-js";
+import qiniufile from "../../util/qiniufile";
+import uuid from "../../util/uuid";
+import { mapActions } from "vuex";
 export default {
   // props: ["productList"],
   data() {
@@ -86,7 +89,7 @@ export default {
     ProductDetail
   },
   computed: {
-    ...mapState(['loginInfos', 'productList']),
+    ...mapState(["loginInfos", "productList"]),
     showEdit() {
       return this.loginInfos.UserCode === "manager" ? true : false;
     }
@@ -95,13 +98,13 @@ export default {
     productList(value) {
       this.$nextTick(function() {
         value.forEach((item, index) => {
-          item.src = item.U_MaxPicPath ? "/api" + item.U_MaxPicPath : "/image/backup.jpg";
-          let img = document.getElementsByTagName('img')[index];
-          item.w = img.width,
-          item.h = img.height,
-          item.target = img;
+          item.src = item.U_MaxPicPath
+            ? "/api" + item.U_MaxPicPath
+            : "/image/backup.jpg";
+          let img = document.getElementsByTagName("img")[index];
+          (item.w = img.width), (item.h = img.height), (item.target = img);
         });
-      })
+      });
     }
   },
   created() {
@@ -111,6 +114,10 @@ export default {
   },
   mounted() {},
   methods: {
+    ...mapActions([
+      "uploadImage",
+      "receiveToken"
+    ]),
     magnifyImg(src) {
       this.isMf = true;
       this.mfImg = src ? "/api" + src : "/image/backup.jpg";
@@ -126,25 +133,60 @@ export default {
       if (!files.length) return; //文件长度大于0
       if (!/^image\//.test(files[0].type)) return; //必须是图片才处理
       if (!window.FileReader) return; //支持FileReader
+
       UploadImg.imageHandle(files, maxSize, imgDom).then(formdata => {
-        formdata.append("docEntry", this.productList[index].DocEntry);
-        formdata.append("lineId", this.productList[index].LineId);
-        formdata.append("action", "ProductionListImage");
-        this.$store
-          .dispatch("uploadImage", formdata)
+        formdata.append("action", "QiNiuToken");
+        formdata.append("Bucket", "ogahome-doc-article");
+        this.receiveToken(formdata)
           .then(data => {
-            if (data.ret === 1) {
-              // this.productList[index].U_MaxPicPath = '/api' + data.pathImage;
-              this.$router.go(0);
-              this.$toast("上传成功", "success");
-            } else if (data.ret === -1) {
-              this.$toast("图片为空", "error");
+            if (data != "") {
+              let key = "productList/" + uuid();
+              let $file = formdata.get('image');
+              qiniufile.upload($file, key, data).then(res => {
+                  let formdata2 = new FormData();
+                  console.log(this.productList[index].DocEntry)
+                  console.log(this.productList[index].LineId)
+                  formdata2.append('action','ProductionListImageUrl');
+                  formdata2.append("docEntry", this.productList[index].DocEntry);
+                  formdata2.append("lineId", this.productList[index].LineId);
+                  formdata2.append('imgUrl',"http://doc.article.ogahome.cn/" + res.key);
+                  this.uploadImage(formdata2).then(data => {
+                    if(data == 1){
+                      this.$router.go(0);
+                      this.$toast("上传成功", "success");
+                    }else{
+                      //删除七牛图片....
+                      this.$router.go(0);
+                      this.$toast("图片上传失败", "success");
+                    }
+                  })
+              });
             } else {
-              this.$toast("上传失败", "error");
+              this.$toast("获取token失败", "error");
             }
           })
-          .catch(error => this.$toast("上传失败", "error"));
+          .catch(error => this.$toast("图片上传失败", "error"));
       });
+
+      // UploadImg.imageHandle(files, maxSize, imgDom).then(formdata => {
+      //   formdata.append("docEntry", this.productList[index].DocEntry);
+      //   formdata.append("lineId", this.productList[index].LineId);
+      //   formdata.append("action", "ProductionListImage");
+      //   this.$store
+      //     .dispatch("uploadImage", formdata)
+      //     .then(data => {
+      //       if (data.ret === 1) {
+      //         // this.productList[index].U_MaxPicPath = '/api' + data.pathImage;
+      //       this.$router.go(0);
+      //       this.$toast("上传成功", "success");  
+      //       } else if (data.ret === -1) {
+      //         this.$toast("图片为空", "error");
+      //       } else {
+      //         this.$toast("上传失败", "error");
+      //       }
+      //     })
+      //     .catch(error => this.$toast("上传失败", "error"));
+      // });
     },
     deletePr() {},
     showBigImg(index) {

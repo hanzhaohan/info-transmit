@@ -1,8 +1,7 @@
 import ajaxs from './ajax'
 
 //上传图片
-// export const uploadImage = param => ajaxs.ajaxFile('/api/service/DOC_DataHandle.ashx', param)
-export const uploadImage = param => ajaxs.ajaxFile('http://upload-z1.qiniup.com/nf', param, 'POST')
+export const uploadImage = param => ajaxs.ajaxFile('/api/service/DOC_DataHandle.ashx', param)
 
 //发布文章
 export const publishArticle = param => ajaxs.ajaxCommon('/api/service/DOC_DataHandle.ashx', param, 'POST')
